@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Welcome to cool’s documentation! &#8212; cool 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-cool-s-documentation">
+<h1>Welcome to cool’s documentation!<a class="headerlink" href="#welcome-to-cool-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Cool is a cohort online analytical processing system, which support both cohort query and OLAP query.</p>
+</div>
+<div class="section" id="storage-design">
+<h1>Storage design<a class="headerlink" href="#storage-design" title="Permalink to this headline">¶</a></h1>
+<p>NEED STORAGE DIAGRAM HERE</p>
+<div class="section" id="datasources">
+<h2>Datasources<a class="headerlink" href="#datasources" title="Permalink to this headline">¶</a></h2>
+<p>Cool data is stored in datasources, which are familier to tables in a tranditional RDBMS. A datasource is consist of metachunk(store meta data and data schema) and cublets(store structed data), compressed as a dz format file. It should be noted that numbers of dz files could belong to the same datasources, these dz files may have same metadata or not, it can be easily understood as sharding.</p>
+</div>
+<div class="section" id="metadata">
+<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h2>
+<p>The metadata storage holds available data. There are some field types in cool: AppKey, UserKey, ActionTime, Day, Action, Segment, Property, Metric, Week, Month, Birth (<strong>Field type should be clean later</strong>). They can be simply divided into two types: range metadata and hash metadata(<strong>May be inaccuracy</strong>). Range metadata holds left bound and right bound of this field, apply to numeric data and date data. Hash metadata holds available values of this field, apply to string data. The system can easily filter whether this cubler is active or not. From anther point, metadata is essential for compress data, for more details in [compress](TODO) page.</p>
+</div>
+<div class="section" id="cublets">
+<h2>Cublets<a class="headerlink" href="#cublets" title="Permalink to this headline">¶</a></h2>
+<p>Cublets is consist of data chunks. Data chunk is designed as column-oriented storage, which is consist of field. Field(Column) can also be invided to two types: range field and hash field. In range field, we get left bound and right bound of this data chunk first, which are helpful to judge should scan this chunk or not. Then we get records to process. In hash field, according to compress strategy we get keys first. Key is the index of available values in meta chunk(which called global id), and we get index of keys as local id consis of records. Use key the system can simply filter processable data chunk. Cool also provid optimize option for enumeration(like order status: unpaid, paid, shipping, completed), called pre-calculate. Benefit by compress algorithm, we get significant promotion by paying less storage space. Noted that data should order by user(for cohort query) and time.</p>
+</div>
+</div>
+<div class="section" id="query-processing">
+<h1>Query processing<a class="headerlink" href="#query-processing" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="cohort-query">
+<h2>cohort query<a class="headerlink" href="#cohort-query" title="Permalink to this headline">¶</a></h2>
+<p>Cohort analysis is a method of analyzing a mertic by comparing its behaviour between groups of users. (<strong>NEED COHORT QUERY DEMO HERE</strong>)The execution of cohort query can be divided to three steps:</p>
+<ol class="arabic simple">
+<li><p>First initialize cohort selection and aggregation. In this stage we get birth filter and age filter.</p></li>
+<li><p>Process metachunk next, system judge the cublet is active or not by birth filter and age filter. Add get global ids of birth action if the cublet is active.</p></li>
+<li><p>If cublet is active, the system would traverse data chunks. Selector would filter data chunk. If data chunk is acrtive, then aggregation would process cohort results. System would merge results after all cublets have been processed.</p></li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">cool</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Ying HongBin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
